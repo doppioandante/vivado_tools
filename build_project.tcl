@@ -44,8 +44,13 @@ create_project ${projectName} ${outputDir} -part xc7a100tcsg324-1 -force
 set_property TARGET_LANGUAGE "VHDL" [current_project]
 
 add_files $sources
-add_files -fileset constrs_1 $constraints
-add_files -fileset sim_1 $tests
+if { [llength $constraints] != 0 } then {
+    add_files -fileset constrs_1 $constraints
+}
+if { [llength $tests] != 0 } then {
+    add_files -fileset sim_1 $tests
+}
+
 import_files -force -norecurse
 set_property file_type {VHDL 2008} [get_files -of_objects [current_fileset]]
 
