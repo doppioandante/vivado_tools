@@ -4,9 +4,8 @@ if { $argc < 1 } {
 }
 
 open_project [lindex $argv 0]
+set bitstream_file [lindex [glob -dir [get_property DIRECTORY [get_runs impl_1]] *.bit] 0]
 
-set project_name [get_property NAME [current_project]]
-set bitstream_file [get_property DIRECTORY [get_runs impl_1]]/$project_name.bit
 
 open_hw
 connect_hw_server
