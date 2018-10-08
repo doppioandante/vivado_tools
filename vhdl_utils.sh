@@ -39,7 +39,9 @@ function vhd_compile {
         return 1
     fi
     
-    ghdl -a --std=08 $(get_project_sources) $(get_project_tests)
+    for file in $(get_project_sources) $(get_project_tests); do
+        ghdl -a --std=08 $file
+    done
     if [ $? -ne 0 ]; then
         echo "Compilation failed"
         return 1
