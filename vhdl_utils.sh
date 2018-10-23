@@ -40,14 +40,14 @@ function vhd_compile {
     fi
     
     for file in $(get_project_sources) $(get_project_tests); do
-        ghdl -a --std=08 $file
+        ghdl -a --std=08 --ieee=synopsys $file
     done
     if [ $? -ne 0 ]; then
         echo "Compilation failed"
         return 1
     fi
     if [ -n "$1" ]; then
-        ghdl -e --std=08 $1
+        ghdl -e --std=08 --ieee=synopsys $1
     fi
 }
 
@@ -63,7 +63,7 @@ function simulate {
         return 1
     fi
     # run and dump vcd for visualization
-    ghdl -r --std=08 $1 --vcd=$1.vcd
+    ghdl -r --std=08 --ieee=synopsys $1 --vcd=$1.vcd
     # do initial zoom automatically and disable initial splash screen
     nohup gtkwave $1.vcd --rcvar 'enable_vcd_autosave yes' --rcvar 'do_initial_zoom_fit yes' --rcvar 'splash_disable yes' > /dev/null 2>&1 &
 }
@@ -102,4 +102,3 @@ function program_device {
     local name=$(get_project_name)
     vivado -nojournal -nolog -mode batch -source $SCRIPT_PATH/program_device.tcl -tclargs Vivado_$name/$name.xpr
 }
-    
