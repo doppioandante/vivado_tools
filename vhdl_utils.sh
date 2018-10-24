@@ -63,9 +63,14 @@ function simulate {
         return 1
     fi
     # run and dump vcd for visualization
-    ghdl -r --std=08 --ieee=synopsys $1 --vcd=$1.vcd
+    ghdl -r --std=08 --ieee=synopsys $1 --wave=$1.ghw
     # do initial zoom automatically and disable initial splash screen
-    nohup gtkwave $1.vcd --rcvar 'enable_vcd_autosave yes' --rcvar 'do_initial_zoom_fit yes' --rcvar 'splash_disable yes' > /dev/null 2>&1 &
+    if [ -z "$(pidof gtkwave)" ]; then
+        nohup gtkwave $1.ghw --rcvar 'do_initial_zoom_fit yes' --rcvar 'splash_disable yes' > /dev/null 2>&1 &
+    else
+        gconftool-2 --type string --set /com.geda.gtkwave/0/reload 0
+        echo "Reloading gtkwave"
+    fi
 }
 
 function create_vivado_project {
