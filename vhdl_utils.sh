@@ -33,6 +33,11 @@ function get_project_constraints {
     echo $res
 }
 
+function get_project_other_files {
+    local res=$(jq -r '.other_files[]' project.json)
+    echo $res
+}
+
 function vhd_compile {
     check_project
     if [ $? -ne 0 ]; then
@@ -86,8 +91,10 @@ function create_vivado_project {
     local sources=$(get_project_sources)
     local constraints=$(get_project_constraints)
     local tests=$(get_project_tests)
+    local other_files=$(get_project_other_files)
     rm -f vivado.log
-    vivado -nojournal -log vivado.log -mode batch -source $SCRIPT_PATH/build_project.tcl -tclargs -name $project_name -sources $sources -constraints $constraints -tests $tests
+    vivado -nojournal -log vivado.log -mode batch -source $SCRIPT_PATH/build_project.tcl -tclargs \
+        -name $project_name -sources $sources -constraints $constraints -tests $tests -other_files $other_files
 }
 
 function open_vivado {

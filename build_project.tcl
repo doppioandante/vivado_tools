@@ -1,5 +1,5 @@
 if { $argc < 2 } {
-    puts "Parameters: -name <project_name> -sources <sources..> -constraints <constraints..> -tests <tests..>"
+    puts "Parameters: -name <project_name> -sources <sources..> -constraints <constraints..> -tests <tests..> -other_files <other files..>"
     exit
 }
 
@@ -7,8 +7,9 @@ set projectName ""
 set sources {}
 set tests {}
 set constraints {}
+set other_files {}
 
-# 0: name, 1: sources, 2: constraints, 3: tests
+# 0: name, 1: sources, 2: constraints, 3: tests, 4: other files
 set state -1
 foreach arg $argv {
     if { $arg eq "-name" } then {
@@ -19,6 +20,8 @@ foreach arg $argv {
         set state 2
     } elseif { $arg eq "-tests" } then {
         set state 3
+    } elseif { $arg eq "-other_files" } then {
+        set state 4
     } else {
         switch $state {
             0 {
@@ -32,6 +35,9 @@ foreach arg $argv {
             }
             3 {
                 lappend tests $arg
+            }
+            4 {
+                lappend other_files $arg
             }
         }
     }
@@ -51,8 +57,12 @@ if { [llength $tests] != 0 } then {
     add_files -fileset sim_1 $tests
 }
 
-import_files -force -norecurse
 set_property file_type {VHDL 2008} [get_files -of_objects [current_fileset]]
+set_property file_type {VHDL 2008} [get_files -of_objects [get_filesets sim_1]]
+if { [llength $other_files] != 0 } then {
+    add_files -fileset [current_fileset] $other_files
+}
+import_files -force -norecurse
 
 update_compile_order -fileset [current_fileset]
 update_compile_order -fileset sim_1
