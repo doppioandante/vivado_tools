@@ -107,7 +107,7 @@ function open_vivado {
         return 1
     fi
     local name=$(get_project_name)
-    vivado -nolog -nojournal Vivado_$name/$name.xpr
+    nohup vivado -nolog -nojournal Vivado_$name/$name.xpr > /dev/null 2>&1 &
 }
 
 function program_device {
