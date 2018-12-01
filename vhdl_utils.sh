@@ -59,9 +59,10 @@ function vhd_compile {
 # parameter: testbench entity to simulate
 function simulate {
     if [ -z "$1" ]; then
-        echo "usage: simulate <testbench enity>"
+        echo "usage: simulate <testbench enity> [--show]"
         return 1
     fi
+
     vhd_compile $1
     if [ $? -ne 0 ]; then
         echo "Simulation won't be run"
@@ -69,12 +70,15 @@ function simulate {
     fi
     # run and dump vcd for visualization
     ghdl -r --std=08 --ieee=synopsys $1 --wave=$1.ghw
-    # do initial zoom automatically and disable initial splash screen
-    if [ -z "$(pidof gtkwave)" ]; then
-        nohup gtkwave $1.ghw --rcvar 'do_initial_zoom_fit yes' --rcvar 'splash_disable yes' > /dev/null 2>&1 &
-    else
-        gconftool-2 --type string --set /com.geda.gtkwave/0/reload 0
-        echo "Reloading gtkwave"
+
+    if [ -n "$2" ] && [ "$2" = "--show" ]; then
+        # do initial zoom automatically and disable initial splash screen
+        if [ -z "$(pidof gtkwave)" ]; then
+            nohup gtkwave $1.ghw --rcvar 'do_initial_zoom_fit yes' --rcvar 'splash_disable yes' > /dev/null 2>&1 &
+        else
+            gconftool-2 --type string --set /com.geda.gtkwave/0/reload 0
+            echo "Reloading gtkwave"
+        fi
     fi
 }
 
