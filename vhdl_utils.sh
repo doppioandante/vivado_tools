@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Requires jq and vivado binaries to be in PATH
+# Requires jq, gconftool-2 and vivado binaries to be in PATH
 
 # optional parameter: entity to be elaborated with ghdl
 # Save script path, because we need build_project.tcl that is inside the same directory
@@ -52,7 +52,7 @@ function vhd_compile {
         return 1
     fi
     if [ -n "$1" ]; then
-        ghdl -e --std=08 --ieee=synopsys $1
+        ghdl -e --std=08 --ieee=synopsys -O2 $1
     fi
 }
 
@@ -79,6 +79,20 @@ function simulate {
             gconftool-2 --type string --set /com.geda.gtkwave/0/reload 0
             echo "Reloading gtkwave"
         fi
+    fi
+}
+
+function show_simulation {
+    if [ -z "$1" ]; then
+        if [ -n "$(pidof gtkwave)" ]; then
+            gconftool-2 --type string --set /com.geda.gtkwave/0/reload 0
+            echo "Reloading gtkwave"
+        else
+            echo "No instance of gtkwave running"
+            echo "Usage: show_simulation [entity]"
+        fi
+    else
+        nohup gtkwave $1.ghw --rcvar 'do_initial_zoom_fit yes' --rcvar 'splash_disable yes' > /dev/null 2>&1 &
     fi
 }
 
